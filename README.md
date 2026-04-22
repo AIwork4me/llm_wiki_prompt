@@ -1,66 +1,52 @@
 # llm_wiki_prompt
 
-面向 AutoClaw / OpenClaw 的 LLM Wiki 提示词仓库。
+面向 AutoClaw / OpenClaw 的统一 LLM Wiki 提示词仓库。
 
-核心灵感来自 Karpathy 的 [LLM Wiki gist](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f)：  
-不要把知识管理做成“每次提问临时检索 raw 的 RAG”，而要做成“在 ingest 阶段持续编译知识、后续 query 优先使用 wiki 的知识层”。
+AutoClaw 由 Z.ai 开发，并提供 OpenClaw 的一键配置；在创建 LLM Wiki 这件事上，两者几乎是同一种工作流，所以这里不再拆成两套 prompt，而是维护一份可同时用于 AutoClaw 和 OpenClaw 的完整提示词。
 
-## 这个仓库包含什么
+核心灵感来自 Karpathy 的 [LLM Wiki gist](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f)：
+不要把知识管理做成“每次提问时临时检索 raw 的 RAG”，而要做成“在 ingest 阶段持续编译知识，query 优先利用已经被整理好的 wiki 知识层”。
 
-- [prompts/openclaw_llm_wiki_from_scratch.md](./prompts/openclaw_llm_wiki_from_scratch.md)
-  OpenClaw 版从零初始化提示词，适合先搭骨架、再逐步 ingest。
-- [prompts/autoclaw_llm_wiki_from_scratch.md](./prompts/autoclaw_llm_wiki_from_scratch.md)
-  AutoClaw 版从零初始化提示词，强化了自治执行、自检和 QA fallback。
-- [articles/wechat_hardcore.md](./articles/wechat_hardcore.md)
-  2000 字以内的微信技术文章：《在AutoClaw中搭建会进化的 Karpathy  LLM Wiki 》。
+## 仓库内容
 
-## 设计原则
+- [prompts/llm_wiki_from_scratch.md](./prompts/llm_wiki_from_scratch.md)
+  一份同时适用于 AutoClaw 和 OpenClaw 的从零构建 LLM Wiki 提示词。
 
-这些不是“写提示词时顺手加的限制”，而是实战后证明必须前置的协议：
+## 这份 prompt 解决什么问题
 
-1. 当前工作目录就是 vault 根目录，禁止再套一层 `llm-wiki/`。
+这不是一个“帮你生成一堆 Markdown 文件”的脚手架 prompt，而是一份让 agent 搭建知识编译系统的协议 prompt。它显式约束了这些在实战里最容易踩坑的点：
+
+1. 当前工作目录就是 vault 根目录，禁止再额外套一层 `llm-wiki/`。
 2. `raw/` 是不可变事实层，`pages/` 才是知识编译层。
-3. 模板不是参考，而是强制起点；新页和重写页都必须从 `_templates/` 开始。
-4. `source_ids` 负责来源追溯，`parent_ids / child_ids` 只负责真实层级，不能拿 source 页去挂一串“派生子页”。
-5. 冲突必须结构化：`status=contested` 时必须有 `conflict_ids`，Lint 也要检查它。
-6. QA 不能只写“未执行”；没有独立 agent 时，也必须留下 self-check fallback 报告。
-7. LLM Wiki 允许少量后验背景补充，但 QA 不能把它误判成“完全来自 raw”。
+3. 模板必须强制使用，新页和重写页都要从 `_templates/` 起步。
+4. `source_ids` 负责来源追溯，`parent_ids / child_ids` 只负责真实层级。
+5. source 页面不能用 `child_ids` 表达“由这篇资料提炼出的页面”。
+6. `status=contested` 时必须有 `conflict_ids`，而且 Lint 要检查它。
+7. 没有独立 QA agent 时，也必须留下 self-check fallback 工件。
+8. `log.md` 不能只写动作名，必须写清受影响对象。
 
-## OpenClaw 和 AutoClaw 的区别
+## 如何使用
 
-### OpenClaw
-
-- 更适合交互式搭骨架和多轮修正。
-- 提示词更强调“当前工作目录”“非破坏式修复”“模板和 schema 落地”。
-- 适合先把 wiki 协议写稳，再手动驱动 ingest。
-
-### AutoClaw
-
-- 更适合自治执行 inspect -> scaffold -> self-check -> fallback QA 的闭环。
-- 提示词更强调阶段化执行、最终自检和日志/QA 工件必须落盘。
-- 适合持续 ingest、周期性 lint 和自动回写。
-
-## 推荐用法
-
-1. 新建一个空目录，作为 LLM Wiki 的 vault 根目录。
-2. 把对应提示词完整粘给 AutoClaw 或 OpenClaw。
-3. 等骨架生成后，放入第一份 raw 资料。
-4. 再告诉 agent：`请 ingest raw/xxx.pdf`。
-5. 检查 `index.md`、`log.md`、`qa-reports/` 是否同步更新。
+1. 新建一个空目录，作为你的 LLM Wiki vault 根目录。
+2. 打开 [prompts/llm_wiki_from_scratch.md](./prompts/llm_wiki_from_scratch.md)。
+3. 将完整 prompt 原文粘贴给 AutoClaw 或 OpenClaw。
+4. 等骨架生成后，把第一份资料放进 `raw/`。
+5. 再告诉 agent：`请 ingest raw/xxx.pdf`。
+6. 检查 `index.md`、`log.md`、`qa-reports/` 是否同步更新。
 
 ## 最小验收标准
 
 一个可用的 LLM Wiki，至少要满足：
 
-- 有 `raw/ pages/ SCHEMA.md index.md log.md qa-reports/ _templates/`
-- `SCHEMA.md` 是真正的执行协议，不是介绍文章
-- source 追溯、层级关系、冲突关系、QA fallback 都有明确定义
+- 有 `raw/`、`pages/`、`SCHEMA.md`、`index.md`、`log.md`、`qa-reports/`、`_templates/`
+- `SCHEMA.md` 是执行协议，而不是介绍文章
+- 模板、来源追溯、层级关系、冲突关系、QA fallback 都有明确定义
 - 第一次 ingest 后，能留下页面、索引、日志和 QA 工件
 
-## 适合什么场景
+## 适合的场景
 
 - 论文知识库
 - LLM / AI 工程知识库
-- 产品 / 竞品研究库
-- 个人技术长期积累
+- 产品与竞品研究库
+- 个人长期技术积累
 - 小团队共享的结构化知识底座
