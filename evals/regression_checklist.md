@@ -47,7 +47,13 @@
 - 默认流程仍然先依赖 index、搜索和简单工具
 - 仓库没有把重型搜索基础设施变成初始化硬依赖
 
-## 9. 最小样例仍然合理
+## 9. 默认结构没有重新变成空骨架清单
+
+- prompt 和 schema 仍然把目录结构描述为候选起点，而不是必须先补齐
+- 样例和 README 没有鼓励保留空分区、空目录或“未来可能会用到”的页面
+- 页面仍然应由当前证据和查询压力长出来
+
+## 10. 最小样例仍然合理
 
 对照 [examples/minimal-vault](../examples/minimal-vault/README.md) 检查：
 
@@ -55,7 +61,18 @@
 - analysis 页是否仍以 `draft` 展示未完全验证的综合
 - QA 报告是否诚实写出局限
 
-## 10. README、prompt、schema 三者仍然一致
+## 11. `stable` 的门槛没有悄悄放松
+
+- `self_check` 不应被写成足以单独支撑 `stable`
+- `stable` 仍然意味着来源、结构和边界都较充分，且经过独立复看或明确人类确认
+- 无法满足时，页面应继续停留在 `draft` 或 `contested`
+
+## 12. ID 分配规则仍然能应对长期维护
+
+- schema 没有把“扫描最大值 + 1”描述成唯一可靠方案
+- 至少承认并行写入时需要计数器文件或别的无冲突分配策略
+
+## 13. README、prompt、schema 三者仍然一致
 
 - README 不应承诺 prompt 或 schema 做不到的事
 - schema 不应重新引入 README 已明确移除的重规则

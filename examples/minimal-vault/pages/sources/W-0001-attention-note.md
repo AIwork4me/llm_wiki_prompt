@@ -9,7 +9,6 @@ source_paths:
 related_ids:
   - W-0002
   - W-0003
-  - W-0004
 tags:
   - sequence-modeling
 ---
@@ -33,14 +32,13 @@ tags:
 这份资料足以支持：
 
 - 新建 `[[W-0002-attention|Attention]]` 概念页
-- 新建 `[[W-0003-transformer|Transformer]]` 实体页
-- 形成一个暂定分析：`[[W-0004-attention-shortens-information-paths|attention 缩短了序列建模中的信息路径]]`
+- 形成一个暂定分析：`[[W-0003-attention-shortens-information-paths|attention 缩短了序列建模中的信息路径]]`
 
 ## 可提炼 / 需更新的页面
 
 - `W-0002` 需要明确区分“动态加权读取”与“记忆”
-- `W-0003` 需要明确写出 Transformer 为什么能摆脱 recurrence 作为主要通信路径
-- `W-0004` 应继续补更多来源，验证“并行性”与“表达能力”之间的关系
+- 如果后续真的反复出现对架构对象的引用，再考虑把 Transformer 单独成页
+- `W-0003` 应继续补更多来源，验证“并行性”与“表达能力”之间的关系
 
 ## 原始路径
 
@@ -49,4 +47,4 @@ tags:
 ## 遗留问题
 
 - 这份资料只有单一来源，还不足以支撑强结论
-- 如果后续加入 RNN、Transformer 原论文或综述，应该回头重写 `W-0004`
+- 如果后续加入 RNN、Transformer 原论文或综述，应该回头重写 `W-0003`

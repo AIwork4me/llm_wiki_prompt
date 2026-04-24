@@ -1,5 +1,5 @@
 ---
-id: W-0004
+id: W-0003
 title: attention 缩短了序列建模中的信息路径
 type: analysis
 updated_at: 2026-04-24
@@ -8,7 +8,6 @@ source_ids:
   - W-0001
 related_ids:
   - W-0002
-  - W-0003
 status: draft
 tags:
   - synthesis
@@ -32,7 +31,7 @@ tags:
 ## 建议回写到哪些页面
 
 - `[[W-0002-attention|Attention]]` 可以吸收“信息路径更短”这一直觉
-- `[[W-0003-transformer|Transformer]]` 可以补充“并行性是工程优势之一”
+- 如果后续相关来源积累到足够密度，再考虑把 Transformer 单独抽成实体页并吸收“并行性是工程优势之一”
 
 ## 仍待验证
 

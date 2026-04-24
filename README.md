@@ -1,6 +1,6 @@
 # llm_wiki_prompt
 
-面向 AutoClaw / OpenClaw 的 LLM Wiki 提示词仓库。
+面向 AutoClaw / OpenClaw 等 Deep Agents的 LLM Wiki 提示词仓库。
 
 这个仓库不是在卖一份“万能 prompt”，而是在分享我们学习完 Karpathy 的 [LLM Wiki gist](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f) 之后，对 LLM Wiki 应该如何设计、如何落地、如何长期维护的一套完整思考。
 
@@ -72,7 +72,7 @@ Karpathy 原始 gist 的精神是 “communicate the pattern, then instantiate w
 
 所以这个仓库采取的是：
 
-- 给出默认实现
+- 给出默认起点，而不是最低合规模板
 - 提供清晰的设计理由
 - 保持可裁剪、可演化
 
@@ -98,9 +98,10 @@ Karpathy 原始 gist 的精神是 “communicate the pattern, then instantiate w
 - `raw/` 是不可变事实层
 - `pages/` 是持续编译、持续重写的知识层
 - 页面文件是真相源，`index.md` 是派生产物，`log.md` 是审计记录
+- 默认结构是候选起点，不是必须先补齐的空骨架
 - frontmatter 默认只要求最小字段，其他字段按需添加
 - `entity` 和 `concept` 应该真的承担不同职责，而不是只换名字
-- query 产生的高价值内容允许回写，但先经过 `draft -> promote`
+- query 产生的高价值内容允许回写，但先经过更保守的 `draft -> promote`
 - `self_check` 与 `independent` 必须诚实区分
 - 小到中等规模时，先依赖 `index.md`、Obsidian 搜索和简单 grep；再按规模引入搜索工具
 
@@ -138,6 +139,7 @@ Karpathy 原始 gist 的精神是 “communicate the pattern, then instantiate w
 ## 这份仓库不主张什么
 
 - 不主张所有领域都照抄同一套目录结构
+- 不主张为了“看起来完整”先建空分区、空目录、空页面
 - 不主张用越来越重的规则堆出“严谨感”
 - 不主张用厚重元数据代替真实理解
 - 不主张把聊天记录原样沉淀成正式知识
