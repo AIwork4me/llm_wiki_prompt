@@ -1,52 +1,57 @@
 # llm_wiki_prompt
 
-面向 AutoClaw / OpenClaw 的统一 LLM Wiki 提示词仓库。
+面向 AutoClaw / OpenClaw 的 LLM Wiki 提示词仓库，灵感来自 Karpathy 的 [LLM Wiki gist](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f)。
 
-AutoClaw 由 Z.ai 开发，并提供 OpenClaw 的一键配置；在创建 LLM Wiki 这件事上，两者几乎是同一种工作流，所以这里不再拆成两套 prompt，而是维护一份可同时用于 AutoClaw 和 OpenClaw 的完整提示词。
+这次重构把仓库拆成了 5 个层次，目的是把“模式”与“默认实现”分开，而不是继续堆一份越来越重的超长 prompt：
 
-核心灵感来自 Karpathy 的 [LLM Wiki gist](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f)：
-不要把知识管理做成“每次提问时临时检索 raw 的 RAG”，而要做成“在 ingest 阶段持续编译知识，query 优先利用已经被整理好的 wiki 知识层”。
-
-## 仓库内容
-
+- [docs/core_principles.md](./docs/core_principles.md)
+  抽象理念。说明 LLM Wiki 为什么成立，以及哪些地方应该保持可变。
 - [prompts/llm_wiki_from_scratch.md](./prompts/llm_wiki_from_scratch.md)
-  一份同时适用于 AutoClaw 和 OpenClaw 的从零构建 LLM Wiki 提示词。
+  可直接复制给 agent 的启动 prompt。它是任务入口，不再承担全部实现细节。
+- [profiles/default/SCHEMA.md](./profiles/default/SCHEMA.md)
+  一个更轻、更诚实的默认 schema profile，附带模板。
+- [examples/minimal-vault/README.md](./examples/minimal-vault/README.md)
+  最小样例 vault，展示一次 ingest 和一次 query-writeback 之后，产物大概应该长什么样。
+- [evals/regression_checklist.md](./evals/regression_checklist.md)
+  回归检查清单。以后改 prompt 时，不用再只靠主观感觉判断好坏。
 
-## 这份 prompt 解决什么问题
+## 这次调整解决了什么
 
-这不是一个“帮你生成一堆 Markdown 文件”的脚手架 prompt，而是一份让 agent 搭建知识编译系统的协议 prompt。它显式约束了这些在实战里最容易踩坑的点：
-
-1. 当前工作目录就是 vault 根目录，禁止再额外套一层 `llm-wiki/`。
-2. `raw/` 是不可变事实层，`pages/` 才是知识编译层。
-3. 模板必须强制使用，新页和重写页都要从 `_templates/` 起步。
-4. `source_ids` 负责来源追溯，`parent_ids / child_ids` 只负责真实层级。
-5. source 页面不能用 `child_ids` 表达“由这篇资料提炼出的页面”。
-6. `status=contested` 时必须有 `conflict_ids`，而且 Lint 要检查它。
-7. 没有独立 QA agent 时，也必须留下 self-check fallback 工件。
-8. `log.md` 不能只写动作名，必须写清受影响对象。
+- 不再把“理念、协议、模板、SOP、输出格式”塞进同一个 500 行 prompt。
+- 默认 schema 只保留最小必需元数据，空字段不再强制填满。
+- `query -> writeback` 新增 `draft -> promote` 门槛，避免把聊天里的临时推断直接固化成“知识”。
+- `index.md` 被明确定义为派生产物；页面本身才是真相源，`log.md` 只负责审计。
+- `child_ids` 被移除，避免维护双向层级带来的重复真相源和长期漂移。
+- `entity` 和 `concept` 的模板被真正区分开，不再只是两个名字不同的同构页面。
+- `self-check` 与独立 QA 被明确区分，不能再把“自己复查自己”包装成同等级背书。
+- 仓库补上了样例和回归基线，后续优化可以更稳定。
 
 ## 如何使用
 
-1. 新建一个空目录，作为你的 LLM Wiki vault 根目录。
-2. 打开 [prompts/llm_wiki_from_scratch.md](./prompts/llm_wiki_from_scratch.md)。
-3. 将完整 prompt 原文粘贴给 AutoClaw 或 OpenClaw。
-4. 等骨架生成后，把第一份资料放进 `raw/`。
-5. 再告诉 agent：`请 ingest raw/xxx.pdf`。
-6. 检查 `index.md`、`log.md`、`qa-reports/` 是否同步更新。
+1. 先读 [docs/core_principles.md](./docs/core_principles.md)，理解这个仓库想表达的模式。
+2. 需要快速开始时，把 [prompts/llm_wiki_from_scratch.md](./prompts/llm_wiki_from_scratch.md) 直接发给 agent。
+3. 需要更具体的默认实现时，再把 [profiles/default/SCHEMA.md](./profiles/default/SCHEMA.md) 也提供给 agent，或者要求它按这个 profile 初始化。
+4. 初始化完成后，对照 [examples/minimal-vault/README.md](./examples/minimal-vault/README.md) 和 [evals/regression_checklist.md](./evals/regression_checklist.md) 做一次 sanity check。
 
-## 最小验收标准
+## 现在的默认设计
 
-一个可用的 LLM Wiki，至少要满足：
-
-- 有 `raw/`、`pages/`、`SCHEMA.md`、`index.md`、`log.md`、`qa-reports/`、`_templates/`
-- `SCHEMA.md` 是执行协议，而不是介绍文章
-- 模板、来源追溯、层级关系、冲突关系、QA fallback 都有明确定义
-- 第一次 ingest 后，能留下页面、索引、日志和 QA 工件
+- `raw/` 是不可变事实层。
+- `pages/` 是持续重写、持续压缩的知识层。
+- 页面文件本身是真相源；`index.md` 是导航派生产物；`log.md` 是时间线审计。
+- frontmatter 默认只要求最小字段，其他字段按需出现，不维护一堆空数组。
+- 可复用但尚未完成验证的 query 结果先写成 `draft`，再决定是否提升为 `stable` 或 `contested`。
+- 默认先用 `index.md`、Obsidian 搜索和简单 grep；当规模让这些手段明显吃力时，再补本地搜索工具。
 
 ## 适合的场景
 
-- 论文知识库
+- 论文和研究知识库
 - LLM / AI 工程知识库
 - 产品与竞品研究库
-- 个人长期技术积累
+- 长期个人学习与写作积累
 - 小团队共享的结构化知识底座
+
+## 不打算做的事
+
+- 不把这个仓库写成某个领域唯一正确的固定制度。
+- 不强迫所有场景都用同一套目录、字段和页面类型。
+- 不用“字段更全”冒充“知识更真”。
