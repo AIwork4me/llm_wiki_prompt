@@ -86,8 +86,8 @@ Karpathy 原始 gist 的精神是 “communicate the pattern, then instantiate w
   可直接发给 agent 的启动 prompt，用来初始化一个可长期维护的 LLM Wiki。
 - [profiles/default/SCHEMA.md](./profiles/default/SCHEMA.md)
   一个默认落地方案，包含目录、最小 frontmatter、ingest/query/lint/QA 约定与模板。
-- [profiles/default/_templates/](./profiles/default/_templates/entity-template.md)
-  默认模板集合。
+- [profiles/default/_templates/](./profiles/default/_templates/)
+  默认模板集合；profile 入口见 [profiles/default/README.md](./profiles/default/README.md)。
 - [examples/minimal-vault/README.md](./examples/minimal-vault/README.md)
   最小样例 vault，展示一次 ingest 和一次 query-writeback 之后，产物应该是什么形态。
 - [evals/regression_checklist.md](./evals/regression_checklist.md)
@@ -99,6 +99,7 @@ Karpathy 原始 gist 的精神是 “communicate the pattern, then instantiate w
 - `pages/` 是持续编译、持续重写的知识层
 - 页面文件是真相源，`index.md` 是派生产物，`log.md` 是审计记录
 - 默认结构是候选起点，不是必须先补齐的空骨架
+- ID 分配默认通过 `_state/id-counter.md` 这类单写入状态文件完成，而不是长期依赖“扫描最大值 + 1”
 - frontmatter 默认只要求最小字段，其他字段按需添加
 - `entity` 和 `concept` 应该真的承担不同职责，而不是只换名字
 - query 产生的高价值内容允许回写，但先经过更保守的 `draft -> promote`

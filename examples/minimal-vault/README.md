@@ -12,6 +12,7 @@
 - 1 个 `concept` 页面
 - 1 个 `analysis` 页面
 - 1 份 `self_check` QA 报告
+- 1 个 `_state/id-counter.md`，用于展示下一枚页面 ID 的分配位置
 
 它不是唯一正确答案，但应该体现默认 profile 的几个关键原则：
 

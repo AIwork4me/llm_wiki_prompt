@@ -3,6 +3,8 @@
 Last updated: 2026-04-24
 Total pages: 3
 
+Status `usable` 表示页面省略了显式 `status`；它可以用于导航，但没有被晋升为 `stable`。
+
 ## Concepts
 
 | ID | Title | Summary | Status | Updated |
@@ -13,7 +15,7 @@ Total pages: 3
 
 | ID | Title | Summary | Status | Updated |
 | --- | --- | --- | --- | --- |
-| W-0001 | [[W-0001-attention-note|Attention Note]] | 一份关于 attention、自注意力与 Transformer 工程取舍的简短原始笔记。 | stable | 2026-04-24 |
+| W-0001 | [[W-0001-attention-note|Attention Note]] | 一份关于 attention、自注意力与 Transformer 工程取舍的简短原始笔记。 | usable | 2026-04-24 |
 
 ## Analyses
 

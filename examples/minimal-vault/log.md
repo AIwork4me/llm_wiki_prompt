@@ -2,7 +2,7 @@
 
 ## [2026-04-24 09:00] create | initialize minimal example vault
 
-- 受影响文件：`SCHEMA.md`、`index.md`、`log.md`
+- 受影响文件：`SCHEMA.md`、`index.md`、`log.md`、`_state/id-counter.md`
 - 说明：建立最小样例 vault，用于展示默认 profile 的输出形态
 
 ## [2026-04-24 09:10] ingest | raw/articles/attention-note.md
