@@ -8,14 +8,18 @@
 - 安装目录、配置文件、配置命令和 skill entry schema 必须按当前宿主环境发现和适配。
 - 不要把 OpenClaw / AutoClaw 的某个默认路径当成所有宿主的强制路径。
 
-## 输入信息
+## 配置区
 
-请把下面占位符替换为真实值后再执行：
+只修改下面代码块中冒号右侧引号内的值。不要修改变量名，不要删除引号，不要把说明文字写进值里。
 
-- ClawHub Token: `<CLAWHUB_TOKEN>`，必须以 `clh_` 开头
-- 文档解析 API: `<DOC_PARSING_API_URL>`，用于 PaddleOCR-VL-1.5 document parsing
-- 文字识别 API: `<OCR_API_URL>`，用于 PP-OCRv5 text recognition
-- PaddleOCR Access Token: `<ACCESS_TOKEN>`，PaddleOCR 官网访问令牌
+```yaml
+CLAWHUB_TOKEN: "clh_请替换为你的 ClawHub Token"
+DOC_PARSING_API_URL: "请替换为你的 PaddleOCR-VL-1.5 document parsing API_URL"
+OCR_API_URL: "请替换为你的 PP-OCRv5 text recognition API_URL"
+PADDLEOCR_ACCESS_TOKEN: "请替换为你的 PaddleOCR 官网访问令牌"
+```
+
+后文提到 `CLAWHUB_TOKEN`、`DOC_PARSING_API_URL`、`OCR_API_URL`、`PADDLEOCR_ACCESS_TOKEN` 时，均指上方配置区中对应的值。命令和 JSON 示例里的这些大写名称不是字面字符串，执行时必须替换为配置区中的真实值。
 
 ## 硬性要求
 
@@ -38,11 +42,11 @@
 实际下载必须使用 ClawHub 下载 API：
 
 ```http
-GET https://wry-manatee-359.convex.site/api/v1/download?slug=<skill-slug>
-Authorization: Bearer <CLAWHUB_TOKEN>
+GET https://wry-manatee-359.convex.site/api/v1/download?slug={skill_slug}
+Authorization: Bearer {CLAWHUB_TOKEN}
 ```
 
-其中 `<skill-slug>` 只能是：
+其中 `skill_slug` 只能是：
 
 - `paddleocr-doc-parsing`
 - `paddleocr-text-recognition`
@@ -68,22 +72,22 @@ API 返回 ZIP 包，正常情况下应包含 `SKILL.md`、`scripts/`、`referen
 2. 如果存在宿主配置命令，例如 `gateway config.patch` 或等价的本机配置命令，先查看 `--help` 或本机文档，确认它写入的配置位置和 patch 格式。
 3. 如果没有配置命令，但存在明确的本机配置文件，可以备份后按原 schema 修改配置文件。
 4. 如果已有配置中能发现 managed skills 目录，必须沿用该目录。
-5. 如果无法发现 managed skills 目录，按宿主本机配置根目录推导 `<HOST_HOME>/skills/`，并在执行前说明推导依据。
+5. 如果无法发现 managed skills 目录，按宿主本机配置根目录推导 `HOST_HOME/skills/`，并在执行前说明推导依据。
 6. 如果无法确定宿主、本机配置根目录或配置 schema，停止并要求用户提供宿主的 skills 目录和配置方式；不要猜测，不要写入项目仓库。
 
 兼容性提示：
 
 - OpenClaw / AutoClaw 可能使用 `~/.openclaw-autoclaw/skills/`，但这只是候选目录，不是强制目录。
-- 其他兼容 Agent 可能使用 `~/.config/<host>/skills/`、`~/.local/share/<host>/skills/` 或自己的 managed skills 目录。
+- 其他兼容 Agent 可能使用 `~/.config/host-name/skills/`、`~/.local/share/host-name/skills/` 或自己的 managed skills 目录。
 - 配置文件不一定叫 `openclaw.json`，配置字段也不一定固定为 `skills.entries`。
 - `path` 可以是绝对路径、`~` 路径或宿主专用 URI；必须沿用当前宿主已有配置风格。
 
 ## 执行步骤
 
 1. 校验输入信息：
-   - `<CLAWHUB_TOKEN>` 非空且以 `clh_` 开头。
-   - `<DOC_PARSING_API_URL>`、`<OCR_API_URL>`、`<ACCESS_TOKEN>` 均非空。
-   - 如果任何值缺失，先要求用户补齐，不要用占位符继续执行。
+   - `CLAWHUB_TOKEN` 非空且以 `clh_` 开头。
+   - `DOC_PARSING_API_URL`、`OCR_API_URL`、`PADDLEOCR_ACCESS_TOKEN` 均非空。
+   - 如果任何值仍是“请替换为...”或明显占位内容，先要求用户补齐，不要继续执行。
 2. 确认工具：
    - 确认 `uv` 可用。
    - 如果 `uv` 不可用，优先安装或启用用户级 `uv`；不要把依赖安装进项目仓库。
@@ -93,7 +97,7 @@ API 返回 ZIP 包，正常情况下应包含 `SKILL.md`、`scripts/`、`referen
    - 如果计划会编辑本机配置文件，先创建同目录备份。
    - 如果发现多个候选 skills 目录，选择当前配置正在使用的目录；无法判断时询问用户。
 4. 使用 ClawHub API 分别下载两个 ZIP：
-   - 请求必须带 `Authorization: Bearer <CLAWHUB_TOKEN>`。
+   - 请求必须带 `Authorization: Bearer CLAWHUB_TOKEN`，其中 `CLAWHUB_TOKEN` 必须替换为配置区中的真实值。
    - 保存到临时目录，不要保存到项目仓库。
    - 校验 HTTP status、文件大小和 ZIP 可解压性。
    - 如果返回 401 / 403，检查 ClawHub Token。
@@ -108,8 +112,8 @@ API 返回 ZIP 包，正常情况下应包含 `SKILL.md`、`scripts/`、`referen
    - 检查 `scripts/` 中会执行的脚本，确认没有删除用户文件、上传本机敏感文件、修改项目仓库或绕过配置的行为。
    - 如发现明显风险，停止安装并报告具体文件和原因。
 7. 安装技能：
-   - 将两个技能分别安装到 `<SKILLS_ROOT>/<skill-slug>/`。
-   - 如果目标技能目录已存在，先备份为同级目录，例如 `<skill-slug>.bak-YYYYMMDD-HHMMSS`。
+   - 将两个技能分别安装到 `SKILLS_ROOT/skill_slug/`。
+   - 如果目标技能目录已存在，先备份为同级目录，例如 `skill_slug.bak-YYYYMMDD-HHMMSS`。
    - 将解压后的技能内容复制到目标路径。
    - 确认两个目标目录下都存在 `SKILL.md`、`scripts/smoke_test.py`、`_meta.json`。
 8. 持久化宿主配置：
@@ -124,10 +128,10 @@ API 返回 ZIP 包，正常情况下应包含 `SKILL.md`、`scripts/`、`referen
    ```json
    {
      "enabled": true,
-     "path": "<DOC_SKILL_DIR>",
+     "path": "DOC_SKILL_DIR",
      "env": {
-       "PADDLEOCR_DOC_PARSING_API_URL": "<DOC_PARSING_API_URL>",
-       "PADDLEOCR_ACCESS_TOKEN": "<ACCESS_TOKEN>"
+       "PADDLEOCR_DOC_PARSING_API_URL": "DOC_PARSING_API_URL",
+       "PADDLEOCR_ACCESS_TOKEN": "PADDLEOCR_ACCESS_TOKEN"
      }
    }
    ```
@@ -137,10 +141,10 @@ API 返回 ZIP 包，正常情况下应包含 `SKILL.md`、`scripts/`、`referen
    ```json
    {
      "enabled": true,
-     "path": "<OCR_SKILL_DIR>",
+     "path": "OCR_SKILL_DIR",
      "env": {
-       "PADDLEOCR_OCR_API_URL": "<OCR_API_URL>",
-       "PADDLEOCR_ACCESS_TOKEN": "<ACCESS_TOKEN>"
+       "PADDLEOCR_OCR_API_URL": "OCR_API_URL",
+       "PADDLEOCR_ACCESS_TOKEN": "PADDLEOCR_ACCESS_TOKEN"
      }
    }
    ```
@@ -158,15 +162,15 @@ API 返回 ZIP 包，正常情况下应包含 `SKILL.md`、`scripts/`、`referen
     文档解析技能：
 
     ```bash
-    cd "<DOC_SKILL_DIR>"
-    PADDLEOCR_DOC_PARSING_API_URL="<DOC_PARSING_API_URL>" PADDLEOCR_ACCESS_TOKEN="<ACCESS_TOKEN>" uv run scripts/smoke_test.py
+    cd "DOC_SKILL_DIR"
+    PADDLEOCR_DOC_PARSING_API_URL="DOC_PARSING_API_URL" PADDLEOCR_ACCESS_TOKEN="PADDLEOCR_ACCESS_TOKEN" uv run scripts/smoke_test.py
     ```
 
     文字识别技能：
 
     ```bash
-    cd "<OCR_SKILL_DIR>"
-    PADDLEOCR_OCR_API_URL="<OCR_API_URL>" PADDLEOCR_ACCESS_TOKEN="<ACCESS_TOKEN>" uv run scripts/smoke_test.py
+    cd "OCR_SKILL_DIR"
+    PADDLEOCR_OCR_API_URL="OCR_API_URL" PADDLEOCR_ACCESS_TOKEN="PADDLEOCR_ACCESS_TOKEN" uv run scripts/smoke_test.py
     ```
 
     如果当前是 PowerShell、Windows cmd 或其他 shell，请使用等价的临时环境变量写法，但语义必须相同。
