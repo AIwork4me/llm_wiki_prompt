@@ -85,7 +85,7 @@ Karpathy 原始 gist 的精神是 “communicate the pattern, then instantiate w
 - [prompts/llm_wiki_from_scratch.md](./prompts/llm_wiki_from_scratch.md)
   可直接发给 agent 的启动 prompt，用来初始化一个可长期维护的 LLM Wiki。
 - [prompts/install_paddleocr_skills_prompt.md](./prompts/install_paddleocr_skills_prompt.md)
-  可直接发给 AutoClaw / OpenClaw 的安装 prompt，用 ClawHub API 一次性下载、配置并验证 PaddleOCR 文档解析和文字识别技能。
+  可直接发给 OpenClaw、AutoClaw 或兼容 Agent 的安装 prompt，用 ClawHub API 下载，并按宿主环境适配安装、配置和验证 PaddleOCR 文档解析与文字识别技能。
 - [profiles/default/SCHEMA.md](./profiles/default/SCHEMA.md)
   一个默认落地方案，包含目录、最小 frontmatter、ingest/query/lint/QA 约定与模板。
 - [profiles/default/_templates/](./profiles/default/_templates/)
@@ -120,9 +120,9 @@ Karpathy 原始 gist 的精神是 “communicate the pattern, then instantiate w
 
 ### 如果你的 ingest 需要解析 PDF、图片或扫描件
 
-把 [prompts/install_paddleocr_skills_prompt.md](./prompts/install_paddleocr_skills_prompt.md) 发给 AutoClaw / OpenClaw，并填入你本机可用的 ClawHub Token、PaddleOCR API URL 和 PaddleOCR Access Token。
+把 [prompts/install_paddleocr_skills_prompt.md](./prompts/install_paddleocr_skills_prompt.md) 发给 OpenClaw、AutoClaw 或兼容 Agent，并填入你本机可用的 ClawHub Token、PaddleOCR API URL 和 PaddleOCR Access Token。
 
-这份 prompt 会要求 agent 只从 ClawHub API 安装并启用 `paddleocr-doc-parsing` 与 `paddleocr-text-recognition` 两个技能，处理依赖、持久化本机环境变量、运行 smoke test，并输出安装报告。Token 和 API 凭据只应写入本机配置或用户级环境变量，不应该提交到这个仓库。
+这份 prompt 会要求 agent 只从 ClawHub API 下载 `paddleocr-doc-parsing` 与 `paddleocr-text-recognition` 两个技能，再按当前宿主发现 managed skills 目录和配置写入方式，处理依赖、持久化本机环境变量、运行 smoke test，并输出安装报告。Token 和 API 凭据只应写入本机配置或用户级环境变量，不应该提交到这个仓库。
 
 ### 如果你想采用仓库里的默认实现
 
